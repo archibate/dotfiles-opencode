@@ -1,2 +1,8 @@
+# OpenCode configuration, contains API secret keys:
 opencode.json
 opencode.jsonc
+
+# OpenCode automatically create these files:
+bun.lock
+package.json
+node_modules

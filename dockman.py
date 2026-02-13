@@ -263,8 +263,12 @@ RUN apt-get install -y software-properties-common
 RUN add-apt-repository ppa:neovim-ppa/unstable -y
 RUN apt-get update
 RUN apt-get install -y neovim
+RUN apt-get install -y python-is-python3 python3-virtualenv
+RUN apt-get install -y clickhouse-client
 
-RUN echo "ubuntu:ubuntu" | chpasswd && adduser ubuntu sudo
+RUN passwd -d ubuntu && echo 'ubuntu ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/ubuntu-nopasswd && chmod 440 /etc/sudoers.d/ubuntu-nopasswd
+
+ENV OPENCODE_DISABLE_AUTOUPDATE=1
 
 USER ubuntu
 RUN echo {base64.b64encode(GIT_WRAPPER.encode()).decode()} | base64 -d > /home/ubuntu/.opencode/bin/git && chmod +x /home/ubuntu/.opencode/bin/git
