@@ -269,6 +269,7 @@ RUN apt-get install -y clickhouse-client
 RUN passwd -d ubuntu && echo 'ubuntu ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/ubuntu-nopasswd && chmod 440 /etc/sudoers.d/ubuntu-nopasswd
 
 ENV OPENCODE_DISABLE_AUTOUPDATE=1
+ENV OPENCODE_ENABLE_EXA=1
 
 USER ubuntu
 RUN echo {base64.b64encode(GIT_WRAPPER.encode()).decode()} | base64 -d > /home/ubuntu/.opencode/bin/git && chmod +x /home/ubuntu/.opencode/bin/git
