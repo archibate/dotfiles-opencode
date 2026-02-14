@@ -266,15 +266,24 @@ RUN apt-get install -y neovim
 RUN apt-get install -y python-is-python3 python3-virtualenv
 RUN apt-get install -y clickhouse-client
 
+RUN npm install -g @franlol/opencode-md-table-formatter@0.0.3
+
 RUN passwd -d ubuntu && echo 'ubuntu ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/ubuntu-nopasswd && chmod 440 /etc/sudoers.d/ubuntu-nopasswd
 
 ENV OPENCODE_DISABLE_AUTOUPDATE=1
 ENV OPENCODE_ENABLE_EXA=1
 
 USER ubuntu
+RUN mkdir -p /home/ubuntu/.local/share/opencode && mkdir -p /home/ubuntu/.local/state/opencode && mkdir -p /home/ubuntu/.cache/opencode
 RUN echo {base64.b64encode(GIT_WRAPPER.encode()).decode()} | base64 -d > /home/ubuntu/.opencode/bin/git && chmod +x /home/ubuntu/.opencode/bin/git
 CMD /bin/bash
 """
+
+OPENCODE_CONFIG_PATHS = {
+    ".config/opencode": "ro",
+    ".local/share/opencode": "rw",
+    ".cache/opencode": "rw",
+}
 
 
 class DockmanError(Exception):
@@ -395,10 +404,11 @@ def cmd_run(args: argparse.Namespace) -> int:
     docker_cmd = [
         "sudo", "-g", "docker", "docker", "run",
         "--add-host=host.docker.internal:host-gateway",
-        "-e", "Z_AI_API_KEY",
-        "-e", "DEEPSEEK_API_KEY",
-        "-e", "CONTEXT7_API_KEY",
+        "-e", f"Z_AI_API_KEY={os.environ.get('Z_AI_API_KEY', '')}",
+        "-e", f"DEEPSEEK_API_KEY={os.environ.get('DEEPSEEK_API_KEY', '')}",
+        "-e", f"CONTEXT7_API_KEY={os.environ.get('CONTEXT7_API_KEY', '')}",
         "-e", f"TERM={os.environ.get('TERM', 'xterm')}",
+        "-e", f"COLORTERM={os.environ.get('COLORTERM', '')}",
         "-e", f"http_proxy={fix_proxy_for_docker(os.environ.get('http_proxy', ''))}",
         "-e", f"https_proxy={fix_proxy_for_docker(os.environ.get('https_proxy', ''))}",
         "-e", f"all_proxy={fix_proxy_for_docker(os.environ.get('all_proxy', ''))}",
@@ -423,12 +433,10 @@ def cmd_run(args: argparse.Namespace) -> int:
         docker_cmd.extend(["-v", f"{gitconfig_path}:/home/ubuntu/.gitconfig:ro"])
 
     # Mount opencode config if exists
-    opencode_path = Path.home() / ".config" / "dockman"
-    if not opencode_path.exists():
-        opencode_path = Path.home() / ".config" / "opencode"
-    if opencode_path.exists():
-        print(f"Using host opencode config: {opencode_path}")
-        docker_cmd.extend(["-v", f"{opencode_path}:/home/ubuntu/.config/opencode:ro"])
+    for mount_path, mount_type in OPENCODE_CONFIG_PATHS.items():
+        if (host_path := Path.home() / mount_path).exists():
+            print(f"Mounting host opencode path: {host_path}")
+            docker_cmd.extend(["-v", f"{host_path}:/home/ubuntu/{mount_path}:{mount_type}"])
 
     # User mapping
     docker_cmd.extend(["-u", f"{os.getuid()}:{os.getgid()}"])
@@ -462,7 +470,7 @@ def set_terminal_title(title: str) -> None:
 
 
 def main() -> int:
-    set_terminal_title("dockman")
+    # set_terminal_title("dockman")
     parser = argparse.ArgumentParser(
         prog=SCRIPT_NAME,
         description="Simple Docker containerization CLI tool"
