@@ -325,19 +325,21 @@ def get_current_dir_name() -> str:
 def cmd_init(args: argparse.Namespace) -> int:
     """Create Dockerfile in current directory."""
     current_dir = Path.cwd()
-    target_dockerfile = current_dir / "Dockerfile"
+    target_dockerfile = current_dir / ".dockman" / "Dockerfile"
 
     if target_dockerfile.exists():
         if not args.force:
-            print(f"✗ Dockerfile already exists in {current_dir}", file=sys.stderr)
+            print(f"✗ Dockerfile already exists in {target_dockerfile}", file=sys.stderr)
             print(f"  Use --force to overwrite", file=sys.stderr)
             return 1
-        print(f"Overwriting existing Dockerfile in {current_dir}", file=sys.stderr)
+        print(f"Overwriting existing Dockerfile in {target_dockerfile}", file=sys.stderr)
 
-    print(f"Creating Dockerfile in {current_dir}", file=sys.stderr)
+    print(f"Creating Dockerfile in {target_dockerfile}", file=sys.stderr)
     if args.dry_run:
+        print(f"mkdir -p {target_dockerfile.parent}")
         print(f"cat > {target_dockerfile} << 'EOF'\n{DOCKERFILE}EOF")
     else:
+        target_dockerfile.parent.mkdir(parents=True, exist_ok=True)
         target_dockerfile.write_text(DOCKERFILE)
 
     return 0
@@ -348,9 +350,9 @@ def cmd_build(args: argparse.Namespace) -> int:
     dir_name = get_current_dir_name()
     current_dir = Path.cwd()
 
-    dockerfile_path = current_dir / "Dockerfile"
+    dockerfile_path = current_dir / ".dockman" / "Dockerfile"
     if not dockerfile_path.exists():
-        print(f"✗ Dockerfile not found in {current_dir}", file=sys.stderr)
+        print(f"✗ Dockerfile not found at {dockerfile_path}", file=sys.stderr)
         print(f"  Run `{SCRIPT_NAME} init` to create one", file=sys.stderr)
         return 1
 
@@ -367,7 +369,7 @@ def cmd_build(args: argparse.Namespace) -> int:
         "sudo", "-g", "docker", "docker", "build",
         *build_args,
         "-t", image_name,
-        str(current_dir)
+        str(dockerfile_path.parent)
     ]
 
     result = execute(cmd, dry_run=args.dry_run)
