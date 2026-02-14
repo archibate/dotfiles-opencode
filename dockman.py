@@ -267,7 +267,6 @@ USER ubuntu
 RUN curl -fsSL https://opencode.ai/install | bash
 ENV PATH="/home/ubuntu/.opencode/bin:$PATH"
 RUN mkdir -p /home/ubuntu/.config/opencode /home/ubuntu/.local/share/opencode /home/ubuntu/.local/state/opencode /home/ubuntu/.cache/opencode
-RUN npm install -g @franlol/opencode-md-table-formatter@0.0.3
 
 # {{{{{{
 RUN echo {base64.b64encode(GIT_WRAPPER.encode()).decode()} | base64 -d > /home/ubuntu/.opencode/bin/git && chmod +x /home/ubuntu/.opencode/bin/git
