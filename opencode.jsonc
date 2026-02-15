@@ -8,42 +8,151 @@
             "npm": "@ai-sdk/openai-compatible",
             "name": "N1N.AI",
             "options": {
-                "baseURL": "https://api.n1n.ai",
+                "baseURL": "https://api.n1n.ai/v1",
                 "apiKey": "{env:N1N_API_KEY}"
             },
             "models": {
-                "gpt-4o-mini": { "name": "GPT-4o-mini" },
-                "gpt-4o": { "name": "GPT-4o" },
-                "gpt-5.3-codex": { "name": "GPT-5.3 Codex" },
-                "gpt-5.3-codex-xhigh": { "name": "GPT-5.3 Codex xHigh" },
-                "gpt-5.3-codex-high": { "name": "GPT-5.3 Codex High" },
-                "gpt-5.3-codex-medium": { "name": "GPT-5.3 Codex Medium" },
-                "gpt-5.3-codex-low": { "name": "GPT-5.3 Codex Low" },
-                "gpt-5.2": { "name": "GPT-5.2" },
-                "gpt-5.2-chat": { "name": "GPT-5.2 Chat" },
-                "gpt-5.2-codex": { "name": "GPT-5.2 Codex" },
-                "gpt-5.1": { "name": "GPT-5.1" },
-                "gpt-5.1-chat": { "name": "GPT-5.1 Chat" },
-                "gpt-5.1-codex": { "name": "GPT-5.1 Codex" },
-                "claude-opus-4-6-thinking": { "name": "Claude Opus 4.6 Thinking" },
-                "claude-opus-4-6": { "name": "Claude Opus 4.6" }
-                "claude-sonnet-4-5-20250929-thinking": { "name": "Claude Sonnet 4.5 Thinking" },
-                "claude-sonnet-4-5-20250929": { "name": "Claude Sonnet 4.5" },
-                "claude-haiku-4-5-20251001-thinking": { "name": "Claude Haiku 4.5 Thinking" },
-                "claude-haiku-4-5-20251001": { "name": "Claude Haiku 4.5" },
-                "grok-4.1": { "name": "Grok 4.1" },
-                "gemini-3-pro-preview-thinking": { "name": "Gemini 3 Pro Thinking" },
-                "gemini-3-pro-preview": { "name": "Gemini 3 Pro" },
-                "gemini-3-flash-preview": { "name": "Gemini 3 Flash" },
-                "gemini-2.5-pro-thinking": { "name": "Gemini 2.5 Thinking" },
-                "gemini-2.5-pro": { "name": "Gemini 2.5 Pro" },
-                "deepseek-v3.2-thinking": { "name": "DeepSeek v3.2 Thinking" },
-                "deepseek-v3.2": { "name": "DeepSeek v3.2" },
-                "deepseek-v3.2-fast": { "name": "DeepSeek v3.2 Fast" },
-                "deepseek-v3.1-thinking": { "name": "DeepSeek v3.1 Thinking" },
-                "deepseek-v3.1": { "name": "DeepSeek v3.1" },
-                "deepseek-reasoner": { "name": "DeepSeek Reasoner" },
-                "deepseek-chat": { "name": "DeepSeek Chat" }
+                // OpenAI Models
+                "gpt-4o-mini": {
+                    "name": "GPT-4o Mini",
+                    "limit": { "context": 128000, "output": 16384 }
+                },
+                "gpt-4o": {
+                    "name": "GPT-4o",
+                    "limit": { "context": 128000, "output": 16384 }
+                },
+                "gpt-5.3-codex": {
+                    "name": "GPT-5.3 Codex",
+                    "limit": { "context": 400000, "output": 128000 }
+                },
+                "gpt-5.2": {
+                    "name": "GPT-5.2",
+                    "limit": { "context": 400000, "output": 128000 }
+                },
+                "gpt-5.2-chat": {
+                    "name": "GPT-5.2 Chat",
+                    "limit": { "context": 128000, "output": 16000 }
+                },
+                "gpt-5.2-codex": {
+                    "name": "GPT-5.2 Codex",
+                    "limit": { "context": 400000, "output": 128000 }
+                },
+                "gpt-5.1": {
+                    "name": "GPT-5.1",
+                    "limit": { "context": 400000, "output": 128000 }
+                },
+                "gpt-5.1-chat": {
+                    "name": "GPT-5.1 Chat",
+                    "limit": { "context": 128000, "output": 16000 }
+                },
+                "gpt-5.1-codex": {
+                    "name": "GPT-5.1 Codex",
+                    "limit": { "context": 400000, "output": 128000 }
+                },
+
+                // Claude Models (Anthropic)
+                "claude-opus-4-6-thinking": {
+                    "name": "Claude Opus 4.6 Thinking",
+                    "limit": { "context": 1000000, "output": 128000 }
+                },
+                "claude-opus-4-6": {
+                    "name": "Claude Opus 4.6",
+                    "limit": { "context": 1000000, "output": 128000 }
+                },
+                "claude-sonnet-4-5-20250929-thinking": {
+                    "name": "Claude Sonnet 4.5 Thinking",
+                    "limit": { "context": 1000000, "output": 64000 }
+                },
+                "claude-sonnet-4-5-20250929": {
+                    "name": "Claude Sonnet 4.5",
+                    "limit": { "context": 1000000, "output": 64000 }
+                },
+                "claude-haiku-4-5-20251001-thinking": {
+                    "name": "Claude Haiku 4.5 Thinking",
+                    "limit": { "context": 200000, "output": 64000 }
+                },
+                "claude-haiku-4-5-20251001": {
+                    "name": "Claude Haiku 4.5",
+                    "limit": { "context": 200000, "output": 64000 }
+                },
+
+                // Grok Models (xAI)
+                "grok-4.1-fast": {
+                    "name": "Grok 4.1 Fast",
+                    "limit": { "context": 2000000, "output": 16000 }
+                },
+                "grok-4.1-fast-reasoning": {
+                    "name": "Grok 4.1 Fast Reasoning",
+                    "limit": { "context": 2000000, "output": 16000 }
+                },
+                "grok-4": {
+                    "name": "Grok 4",
+                    "limit": { "context": 256000, "output": 16000 }
+                },
+                "grok-4-fast": {
+                    "name": "Grok 4 Fast",
+                    "limit": { "context": 256000, "output": 16000 }
+                },
+                "grok-3-mini": {
+                    "name": "Grok 3 Mini",
+                    "limit": { "context": 131072, "output": 131072 }
+                },
+
+                // Gemini Models (Google)
+                "gemini-3-pro": {
+                    "name": "Gemini 3 Pro",
+                    "limit": { "context": 1000000, "output": 64000 }
+                },
+                "gemini-3-flash": {
+                    "name": "Gemini 3 Flash",
+                    "limit": { "context": 1000000, "output": 65000 }
+                },
+                "gemini-2.5-pro": {
+                    "name": "Gemini 2.5 Pro",
+                    "limit": { "context": 1000000, "output": 65000 }
+                },
+
+                // DeepSeek Models
+                "deepseek-v3.2-thinking": {
+                    "name": "DeepSeek v3.2 Thinking",
+                    "limit": { "context": 131072, "output": 64000 }
+                },
+                "deepseek-v3.2": {
+                    "name": "DeepSeek v3.2",
+                    "limit": { "context": 131072, "output": 8000 }
+                },
+                "deepseek-v3.2-fast": {
+                    "name": "DeepSeek v3.2 Fast",
+                    "limit": { "context": 131072, "output": 8000 }
+                },
+                "deepseek-reasoner": {
+                    "name": "DeepSeek Reasoner",
+                    "limit": { "context": 131072, "output": 64000 }
+                },
+                "deepseek-chat": {
+                    "name": "DeepSeek Chat",
+                    "limit": { "context": 131072, "output": 8000 }
+                },
+
+                // Qwen Models (Alibaba)
+                "qwen3-coder": {
+                    "name": "Qwen 3 Coder",
+                    "limit": { "context": 256000, "output": 256000 }
+                },
+
+                // Kimi Models (Moonshot AI)
+                "kimi-k2.5": {
+                    "name": "Kimi K2.5",
+                    "limit": { "context": 262144, "output": 32768 }
+                },
+                "kimi-k2-instruct": {
+                    "name": "Kimi K2 Instruct",
+                    "limit": { "context": 131072, "output": 8192 }
+                },
+                "kimi-k2-thinking": {
+                    "name": "Kimi K2 Thinking",
+                    "limit": { "context": 262144, "output": 16384 }
+                }
             },
         },
         "deepseek": {
