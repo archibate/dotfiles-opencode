@@ -1,11 +1,22 @@
 ---
 name: tmux-guide
 description: |
-    MUST use this skill before starting ANY long tasks run for more than **2 minutes** or run **indefinitely**. Examples: web servers, dataset pipeline, model training.
+    Tmux skill for running background tasks.
+    Use this skill when:
+    1. Before any tasks that can potentially run for more than 2 minutes (e.g.: package install, many tests, model training)
+    2. Before any tasks that are expected to run indefinitely in background (e.g.: web servers, port forwarding)
+    3. Bash tool reports `timeout after 120000ms`
+    4. User request to run tasks in background
 ---
 # Tmux guidelines
 
-Use `tmux` for any tasks run for more than 2 minutes or run indefinitely. Examples: web servers, dataset pipeline, model training.
+Use `tmux` for any tasks run for more than 2 minutes or run indefinitely.
+
+Examples are: package install, many tests, web servers, port forwarding, dataset pipeline, model training.
+
+If bash tool reports `timeout after 120000ms`:
+- This means the task you are running is expected to run for more than 2 minutes.
+- Must use `tmux` for running this task.
 
 ## New session
 

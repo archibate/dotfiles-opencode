@@ -1,0 +1,30 @@
+{
+  "sound": false,
+  "notification": true,
+  "timeout": 2,
+  "showProjectName": true,
+  "events": {
+    "permission": {
+      "sound": false,
+      "notification": true
+    },
+    "complete": {
+      "sound": false,
+      "notification": true
+    },
+    "error": {
+      "sound": false,
+      "notification": true
+    },
+    "question": {
+      "sound": false,
+      "notification": true
+    }
+  },
+  "messages": {
+    "permission": "Action required",
+    "complete": "Done!",
+    "error": "Something went wrong",
+    "question": "Input needed"
+  }
+}
