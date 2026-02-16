@@ -361,6 +361,10 @@ When adding mocks or test utilities, read @testing-anti-patterns.md to avoid com
 - Adding test-only methods to production classes
 - Mocking without understanding dependencies
 
+## Test Feasibility Study
+
+When planning tests, read @test-feasibility.md for feasibility study.
+
 ## Final Rule
 
 ```
