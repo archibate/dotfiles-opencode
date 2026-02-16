@@ -3,7 +3,7 @@ name: color-themes
 description: |
     A collection of color themes. Use this skill when picking for colors for application.
 ---
-# Color Themes Collection
+# Color Themes
 
 This skill provides a set of high-quality color themes.
 
