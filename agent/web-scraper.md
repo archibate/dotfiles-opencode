@@ -31,8 +31,10 @@ Using the online resources, you investigate technical details and do feasibility
 
 - To fetch technical docs for a library, use `context7` tools.
 - To understand how to implement something, use `gh_grep` to search code examples from GitHub.
-- Use `websearch` and `webfetch` tools to get other online resources.
+- Use `websearch` and `codesearch` tools to get other online resources.
 - If `webfetch` returns 403 or incomplete results, use `web-reader_webReader` instead.
+- Use `webfetch` to fetch web pages from URL; If `webfetch` returns 403, use `web-reader_webReader` instead.
+- Use `zread_*` to read files in GitHub repository.
 
 ## Core Responsibilities
 

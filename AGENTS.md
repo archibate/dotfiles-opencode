@@ -15,5 +15,6 @@ For fresh project:
 
 - When you need docs for a library, use `context7` tools.
 - If you are unsure how to implement something, use `gh_grep` to search code examples from GitHub.
-- Use `websearch` and `webfetch` tools to get other online resources.
-- If `webfetch` returns 403, use `web-reader_webReader` instead.
+- Use `websearch` and `codesearch` tools to get other online resources.
+- Use `webfetch` to fetch web pages from URL; If `webfetch` returns 403, use `web-reader_webReader` instead.
+- Use `zread_*` to read files in GitHub repository.
