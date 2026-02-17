@@ -1,6 +1,6 @@
 ---
 description: Web-Scraper
-mode: all
+mode: subagent
 temperature: 0.0
 tools:
   read: true
