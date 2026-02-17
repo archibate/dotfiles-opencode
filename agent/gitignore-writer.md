@@ -10,8 +10,8 @@ tools:
   codesearch: false
   webfetch: false
   question: false
-  write: false
-  edit: false
+  write: true
+  edit: true
   bash: true
   task: false
 ---

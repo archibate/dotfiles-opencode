@@ -34,9 +34,9 @@ Acceptance Criteria: Form validates email format, shows error messages, and redi
 6. **Do not modify code outside** the scope of the current task.
 
 ## Completion Protocol
-- Once you have implemented the task and verified it meets all acceptance criteria, report back to the Executor with a simple confirmation:  
+- Once you have implemented the task and verified it meets all acceptance criteria, report back to the Executor with a simple confirmation:
   `Task complete.`
-- If you encounter blockers, missing information, or ambiguity, report:  
+- If you encounter blockers, missing information, or ambiguity, report:
   `Cannot complete: [brief explanation of the issue]`
 
 ## Subagents to Delegate
