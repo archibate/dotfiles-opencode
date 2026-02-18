@@ -3,5 +3,11 @@ bun.lock
 package.json
 node_modules/
 
+# Python files:
+__pycache__/
+
+# Dockman files:
+.dockman/
+
 # Private skills
 /skills/private/

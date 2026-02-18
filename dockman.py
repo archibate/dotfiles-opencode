@@ -426,6 +426,113 @@ def get_container_status(container_name: str) -> str:
     return "nonexistent"
 
 
+def build_docker_run_command(args, current_dir, image_name, container_name=None):
+    """Build docker run command with appropriate options."""
+    docker_cmd = [
+        "sudo",
+        "-g",
+        "docker",
+        "docker",
+        "run",
+        "--add-host=host.docker.internal:host-gateway",
+        "-e",
+        f"Z_AI_API_KEY={os.environ.get('Z_AI_API_KEY', '')}",
+        "-e",
+        f"DEEPSEEK_API_KEY={os.environ.get('DEEPSEEK_API_KEY', '')}",
+        "-e",
+        f"CONTEXT7_API_KEY={os.environ.get('CONTEXT7_API_KEY', '')}",
+        "-e",
+        f"TERM={os.environ.get('TERM', 'xterm')}",
+        "-e",
+        f"COLORTERM={os.environ.get('COLORTERM', '')}",
+        "-e",
+        f"http_proxy={fix_proxy_for_docker(os.environ.get('http_proxy', ''))}",
+        "-e",
+        f"https_proxy={fix_proxy_for_docker(os.environ.get('https_proxy', ''))}",
+        "-e",
+        f"all_proxy={fix_proxy_for_docker(os.environ.get('all_proxy', ''))}",
+        "-e",
+        f"no_proxy={os.environ.get('no_proxy', '')},host.docker.internal",
+    ]
+
+    # Set container name if provided (for reuse)
+    if container_name:
+        docker_cmd.extend(["--name", container_name])
+
+    # Set working directory
+    workdir = args.workdir if args.workdir else current_dir.as_posix()
+    docker_cmd.extend(["-w", workdir])
+
+    # Mount current directory
+    docker_cmd.extend(["-v", f"{current_dir}:{workdir}"])
+
+    # Mount additional volumes
+    for mount in args.mount or []:
+        docker_cmd.extend(["-v", mount])
+
+    # Mount git config if exists
+    gitconfig_path = Path.home() / ".gitconfig"
+    if gitconfig_path.exists():
+        print(f"Using host git config: {gitconfig_path}", file=sys.stderr)
+        docker_cmd.extend(["-v", f"{gitconfig_path}:/home/ubuntu/.gitconfig:ro"])
+
+    # Mount mistake notebook if exists
+    mistake_path = Path.home() / "MISTAKE.md"
+    if mistake_path.exists():
+        print(f"Using host mistake notebook: {mistake_path}", file=sys.stderr)
+        docker_cmd.extend(["-v", f"{mistake_path}:/home/ubuntu/MISTAKE.md"])
+
+    # Mount opencode config if exists
+    for mount_path, mount_type in OPENCODE_CONFIG_PATHS.items():
+        if (host_path := Path.home() / mount_path).exists():
+            print(f"Mounting host opencode path: {host_path}", file=sys.stderr)
+            docker_cmd.extend(
+                ["-v", f"{host_path}:/home/ubuntu/{mount_path}:{mount_type}"]
+            )
+
+    # User mapping
+    docker_cmd.extend(["-u", f"{os.getuid()}:{os.getgid()}"])
+
+    # Interactive or not
+    if not args.no_interactive:
+        docker_cmd.extend(["--init", "-it"])
+        # Only add --rm if not reusing container
+        if not container_name:
+            docker_cmd.extend(["--rm"])
+    else:
+        # Only add --rm if not reusing container
+        if not container_name:
+            docker_cmd.extend(["--rm"])
+
+    docker_cmd.append(image_name)
+
+    # Command to run
+    if args.cmd:
+        docker_cmd.extend(args.cmd)
+
+    return docker_cmd
+
+
+def build_docker_exec_command(args, container_name):
+    """Build docker exec command."""
+    docker_cmd = ["sudo", "-g", "docker", "docker", "exec"]
+
+    # Interactive or not
+    if not args.no_interactive:
+        docker_cmd.extend(["-it"])
+
+    docker_cmd.append(container_name)
+
+    # Command to run
+    if args.cmd:
+        docker_cmd.extend(args.cmd)
+    else:
+        # Default shell
+        docker_cmd.append("bash")
+
+    return docker_cmd
+
+
 def cmd_run(args: argparse.Namespace) -> int:
     """Run docker container."""
     dir_name = get_current_dir_name()
@@ -455,80 +562,89 @@ def cmd_run(args: argparse.Namespace) -> int:
         print(f"  Run `{SCRIPT_NAME} build` first", file=sys.stderr)
         return 1
 
-    # Build docker run command
-    docker_cmd = [
-        "sudo",
-        "-g",
-        "docker",
-        "docker",
-        "run",
-        "--add-host=host.docker.internal:host-gateway",
-        "-e",
-        f"Z_AI_API_KEY={os.environ.get('Z_AI_API_KEY', '')}",
-        "-e",
-        f"DEEPSEEK_API_KEY={os.environ.get('DEEPSEEK_API_KEY', '')}",
-        "-e",
-        f"CONTEXT7_API_KEY={os.environ.get('CONTEXT7_API_KEY', '')}",
-        "-e",
-        f"TERM={os.environ.get('TERM', 'xterm')}",
-        "-e",
-        f"COLORTERM={os.environ.get('COLORTERM', '')}",
-        "-e",
-        f"http_proxy={fix_proxy_for_docker(os.environ.get('http_proxy', ''))}",
-        "-e",
-        f"https_proxy={fix_proxy_for_docker(os.environ.get('https_proxy', ''))}",
-        "-e",
-        f"all_proxy={fix_proxy_for_docker(os.environ.get('all_proxy', ''))}",
-        "-e",
-        f"no_proxy={os.environ.get('no_proxy', '')},host.docker.internal",
-    ]
+    # Reuse container logic
+    if args.reuse:
+        container_name = f"dockman-{dir_name.lower()}"
+        status = get_container_status(container_name)
 
-    # Set working directory
-    workdir = args.workdir if args.workdir else current_dir.as_posix()
-    docker_cmd.extend(["-w", workdir])
-
-    # Mount current directory
-    docker_cmd.extend(["-v", f"{current_dir}:{workdir}"])
-
-    # Mount additional volumes
-    for mount in args.mount or []:
-        docker_cmd.extend(["-v", mount])
-
-    # Mount git config if exists
-    gitconfig_path = Path.home() / ".gitconfig"
-    if gitconfig_path.exists():
-        print(f"Using host git config: {gitconfig_path}")
-        docker_cmd.extend(["-v", f"{gitconfig_path}:/home/ubuntu/.gitconfig:ro"])
-
-    # Mount git config if exists
-    mistake_path = Path.home() / "MISTAKE.md"
-    if mistake_path.exists():
-        print(f"Using host mistake notebook: {mistake_path}")
-        docker_cmd.extend(["-v", f"{gitconfig_path}:/home/ubuntu/MISTAKE.md"])
-
-    # Mount opencode config if exists
-    for mount_path, mount_type in OPENCODE_CONFIG_PATHS.items():
-        if (host_path := Path.home() / mount_path).exists():
-            print(f"Mounting host opencode path: {host_path}")
-            docker_cmd.extend(
-                ["-v", f"{host_path}:/home/ubuntu/{mount_path}:{mount_type}"]
+        if status == "nonexistent":
+            # Create new container with --name and no --rm
+            docker_cmd = build_docker_run_command(
+                args, current_dir, image_name, container_name
             )
+            result = execute(docker_cmd, dry_run=args.dry_run)
+            return result.returncode
 
-    # User mapping
-    docker_cmd.extend(["-u", f"{os.getuid()}:{os.getgid()}"])
+        elif status == "stopped":
+            # Start stopped container
+            if args.cmd:
+                # Start container first
+                start_cmd = ["sudo", "-g", "docker", "docker", "start", container_name]
+                start_result = execute(start_cmd, dry_run=args.dry_run)
+                if start_result.returncode != 0:
+                    return start_result.returncode
+                # Then exec command
+                exec_cmd = build_docker_exec_command(args, container_name)
+                result = execute(exec_cmd, dry_run=args.dry_run)
+                return result.returncode
+            else:
+                # Start and attach
+                if args.no_interactive:
+                    start_cmd = [
+                        "sudo",
+                        "-g",
+                        "docker",
+                        "docker",
+                        "start",
+                        container_name,
+                    ]
+                else:
+                    start_cmd = [
+                        "sudo",
+                        "-g",
+                        "docker",
+                        "docker",
+                        "start",
+                        "-ai",
+                        container_name,
+                    ]
+                result = execute(start_cmd, dry_run=args.dry_run)
+                return result.returncode
 
-    # Interactive or not
-    if not args.no_interactive:
-        docker_cmd.extend(["--rm", "--init", "-it"])
-    else:
-        docker_cmd.extend(["--rm"])
+        elif status == "running":
+            # Container already running
+            if args.cmd:
+                exec_cmd = build_docker_exec_command(args, container_name)
+                result = execute(exec_cmd, dry_run=args.dry_run)
+                return result.returncode
+            else:
+                # Attach new shell
+                if args.no_interactive:
+                    print(
+                        f"Container {container_name} is already running",
+                        file=sys.stderr,
+                    )
+                    return 0
+                else:
+                    exec_cmd = [
+                        "sudo",
+                        "-g",
+                        "docker",
+                        "docker",
+                        "exec",
+                        "-it",
+                        container_name,
+                        "bash",
+                    ]
+                    result = execute(exec_cmd, dry_run=args.dry_run)
+                    return result.returncode
 
-    docker_cmd.append(image_name)
+        else:
+            print(f"✗ Unknown container status: {status}", file=sys.stderr)
+            return 1
 
-    # Command to run
-    if args.cmd:
-        docker_cmd.extend(args.cmd)
-
+    # Original behavior (no --reuse)
+    docker_cmd = build_docker_run_command(args, current_dir, image_name)
     result = execute(docker_cmd, dry_run=args.dry_run)
     return result.returncode
 
@@ -588,7 +704,7 @@ def main() -> int:
         "--no-interactive", action="store_true", help="Run in non-interactive mode"
     )
     run_parser.add_argument(
-        "--reuse",
+        "-r", "--reuse",
         action="store_true",
         help="Reuse existing container instead of creating new one",
     )
