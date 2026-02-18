@@ -283,6 +283,7 @@ OPENCODE_CONFIG_PATHS = {
 
 class DockmanError(Exception):
     """Base exception for dockman errors."""
+
     pass
 
 
@@ -321,10 +322,14 @@ def cmd_init(args: argparse.Namespace) -> int:
 
     if target_dockerfile.exists():
         if not args.force:
-            print(f"✗ Dockerfile already exists in {target_dockerfile}", file=sys.stderr)
+            print(
+                f"✗ Dockerfile already exists in {target_dockerfile}", file=sys.stderr
+            )
             print(f"  Use --force to overwrite", file=sys.stderr)
             return 1
-        print(f"Overwriting existing Dockerfile in {target_dockerfile}", file=sys.stderr)
+        print(
+            f"Overwriting existing Dockerfile in {target_dockerfile}", file=sys.stderr
+        )
 
     print(f"Creating Dockerfile in {target_dockerfile}", file=sys.stderr)
     if args.dry_run:
@@ -358,14 +363,67 @@ def cmd_build(args: argparse.Namespace) -> int:
     build_args.extend(["--add-host=host.docker.internal:host-gateway"])
 
     cmd = [
-        "sudo", "-g", "docker", "docker", "build",
+        "sudo",
+        "-g",
+        "docker",
+        "docker",
+        "build",
         *build_args,
-        "-t", image_name,
-        str(dockerfile_path.parent)
+        "-t",
+        image_name,
+        str(dockerfile_path.parent),
     ]
 
     result = execute(cmd, dry_run=args.dry_run)
     return result.returncode
+
+
+def get_container_status(container_name: str) -> str:
+    """Check container status.
+    Returns: 'nonexistent', 'running', or 'stopped'
+    """
+    # Check running containers
+    result = subprocess.run(
+        [
+            "sudo",
+            "-g",
+            "docker",
+            "docker",
+            "ps",
+            "--format",
+            "json",
+            "--filter",
+            f"name={container_name}",
+        ],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if result.returncode == 0 and result.stdout.strip():
+        return "running"
+
+    # Check all containers (including stopped)
+    result = subprocess.run(
+        [
+            "sudo",
+            "-g",
+            "docker",
+            "docker",
+            "ps",
+            "-a",
+            "--format",
+            "json",
+            "--filter",
+            f"name={container_name}",
+        ],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if result.returncode == 0 and result.stdout.strip():
+        return "stopped"
+
+    return "nonexistent"
 
 
 def cmd_run(args: argparse.Namespace) -> int:
@@ -379,7 +437,7 @@ def cmd_run(args: argparse.Namespace) -> int:
         ["sudo", "-g", "docker", "docker", "images", "--format", "json"],
         text=True,
         capture_output=True,
-        check=True
+        check=True,
     )
 
     image_exists = False
@@ -399,17 +457,30 @@ def cmd_run(args: argparse.Namespace) -> int:
 
     # Build docker run command
     docker_cmd = [
-        "sudo", "-g", "docker", "docker", "run",
+        "sudo",
+        "-g",
+        "docker",
+        "docker",
+        "run",
         "--add-host=host.docker.internal:host-gateway",
-        "-e", f"Z_AI_API_KEY={os.environ.get('Z_AI_API_KEY', '')}",
-        "-e", f"DEEPSEEK_API_KEY={os.environ.get('DEEPSEEK_API_KEY', '')}",
-        "-e", f"CONTEXT7_API_KEY={os.environ.get('CONTEXT7_API_KEY', '')}",
-        "-e", f"TERM={os.environ.get('TERM', 'xterm')}",
-        "-e", f"COLORTERM={os.environ.get('COLORTERM', '')}",
-        "-e", f"http_proxy={fix_proxy_for_docker(os.environ.get('http_proxy', ''))}",
-        "-e", f"https_proxy={fix_proxy_for_docker(os.environ.get('https_proxy', ''))}",
-        "-e", f"all_proxy={fix_proxy_for_docker(os.environ.get('all_proxy', ''))}",
-        "-e", f"no_proxy={os.environ.get('no_proxy', '')},host.docker.internal",
+        "-e",
+        f"Z_AI_API_KEY={os.environ.get('Z_AI_API_KEY', '')}",
+        "-e",
+        f"DEEPSEEK_API_KEY={os.environ.get('DEEPSEEK_API_KEY', '')}",
+        "-e",
+        f"CONTEXT7_API_KEY={os.environ.get('CONTEXT7_API_KEY', '')}",
+        "-e",
+        f"TERM={os.environ.get('TERM', 'xterm')}",
+        "-e",
+        f"COLORTERM={os.environ.get('COLORTERM', '')}",
+        "-e",
+        f"http_proxy={fix_proxy_for_docker(os.environ.get('http_proxy', ''))}",
+        "-e",
+        f"https_proxy={fix_proxy_for_docker(os.environ.get('https_proxy', ''))}",
+        "-e",
+        f"all_proxy={fix_proxy_for_docker(os.environ.get('all_proxy', ''))}",
+        "-e",
+        f"no_proxy={os.environ.get('no_proxy', '')},host.docker.internal",
     ]
 
     # Set working directory
@@ -439,7 +510,9 @@ def cmd_run(args: argparse.Namespace) -> int:
     for mount_path, mount_type in OPENCODE_CONFIG_PATHS.items():
         if (host_path := Path.home() / mount_path).exists():
             print(f"Mounting host opencode path: {host_path}")
-            docker_cmd.extend(["-v", f"{host_path}:/home/ubuntu/{mount_path}:{mount_type}"])
+            docker_cmd.extend(
+                ["-v", f"{host_path}:/home/ubuntu/{mount_path}:{mount_type}"]
+            )
 
     # User mapping
     docker_cmd.extend(["-u", f"{os.getuid()}:{os.getgid()}"])
@@ -475,23 +548,23 @@ def set_terminal_title(title: str) -> None:
 def main() -> int:
     # set_terminal_title("dockman")
     parser = argparse.ArgumentParser(
-        prog=SCRIPT_NAME,
-        description="Simple Docker containerization CLI tool"
+        prog=SCRIPT_NAME, description="Simple Docker containerization CLI tool"
     )
     parser.add_argument(
-        "-d", "--dry-run",
+        "-d",
+        "--dry-run",
         action="store_true",
-        help="Show commands without executing them"
+        help="Show commands without executing them",
     )
 
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
     # init command
-    init_parser = subparsers.add_parser("init", help="Create Dockerfile in current directory")
+    init_parser = subparsers.add_parser(
+        "init", help="Create Dockerfile in current directory"
+    )
     init_parser.add_argument(
-        "-f", "--force",
-        action="store_true",
-        help="Overwrite existing Dockerfile"
+        "-f", "--force", action="store_true", help="Overwrite existing Dockerfile"
     )
 
     # build command
@@ -500,23 +573,24 @@ def main() -> int:
     # run command
     run_parser = subparsers.add_parser("run", help="Run docker container")
     run_parser.add_argument(
-        "-m", "--mount",
-        action="append",
-        help="Mount additional volume (e.g., src:dst)"
+        "-m", "--mount", action="append", help="Mount additional volume (e.g., src:dst)"
     )
     run_parser.add_argument(
-        "-w", "--workdir",
-        help="Working directory inside container"
+        "-w", "--workdir", help="Working directory inside container"
     )
     run_parser.add_argument(
-        "-c", "--cmd",
+        "-c",
+        "--cmd",
         nargs=argparse.REMAINDER,
-        help="Command to run (default: /bin/bash)"
+        help="Command to run (default: /bin/bash)",
     )
     run_parser.add_argument(
-        "--no-interactive",
+        "--no-interactive", action="store_true", help="Run in non-interactive mode"
+    )
+    run_parser.add_argument(
+        "--reuse",
         action="store_true",
-        help="Run in non-interactive mode"
+        help="Reuse existing container instead of creating new one",
     )
 
     # version command

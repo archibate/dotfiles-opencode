@@ -1,7 +1,7 @@
 ---
 name: mistake-notebook
 description: |
-    Skill to query and update mistake notebook. Use this skill when:
+    Skill to query and update a mistake notebook to memorize mistake. Use this skill when:
     1. Encountered a severe problem, needs to recall for historical problem solving experience
     2. After fixed a severe mistake with a clear solution valuable to be recorded
     3. User requested 'Do not make this mistake again'

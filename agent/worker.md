@@ -39,11 +39,41 @@ Acceptance Criteria: Form validates email format, shows error messages, and redi
 - If you encounter blockers, missing information, or ambiguity, report:
   `Cannot complete: [brief explanation of the issue]`
 
+## Progress Tracking
+
+- Before start working, read `PROGESS.txt` to get speed up of previous task progress.
+- After completion, summarize your progress in this step and append into `PROGESS.txt`.
+
+## Skills to Use
+
+When begining working on a task: List all skills you have, use any relevant skills. For example:
+
+- Use setup-fresh-project skill if in a fresh project.
+- Use test-driven-development skill if TDD is appliable.
+- Use mistake-notebook to memorize mistakes and look for historical mistake solution.
+- Use systematic-debugging when debugging.
+- Use verification-before-completion before claiming completion.
+
+## Autonomus Execution
+
+Complete the task on your own - do not ask for human interception.
+
+For example:
+- TDD: Run the **unit tests** and **intergrated tests** to verify correctness.
+- Data Science: Run the data pipeline and do **data quality validation** on generated dataset.
+- Web: Use **RESTful API** or **browser automation tools** to navigate websites for end-to-end test.
+- TUI: Run the application in **PTY tools**, send key strokes and watch behavior.
+- GUI: Use **screenshot tools** and **vision capbility** to view user interface.
+
+> Install requirements freely if tools are missing, no need for asking user confirmation.
+
+This avoids asking human for interaction, save the human user from being constantly annoyed by the worker agent.
+
 ## Subagents to Delegate
 
 - @explorer: explore relevant code context.
 - @web-scraper: search for online references.
-- @tdd-dev: delegate to the TDD developer if TDD (Test-Driven Design) is appliable to the task.
+- @tdd-dev: delegate task to the TDD developer if TDD is appliable.
 - @gitignore-writer: delegate gitignore-writer if there are no .gitignore yet or require update.
 
 ## Important Rules
