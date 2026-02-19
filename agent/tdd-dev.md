@@ -167,7 +167,7 @@ All tests now pass. The status in each scenario document has been updated accord
 For each scenario where tests are now passing:
 
 - Refactor the implementation code to improve readability, structure, and maintainability **without changing its external behavior**.
-- After refactoring, re‑run the tests to ensure they still pass.
+- After refactoring, re-run the tests to ensure they still pass.
 - Update the scenario document status: check `- [x] Refactor implementation without breaking test`.
 
 After implementation refactored:
