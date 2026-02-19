@@ -1,5 +1,7 @@
 # Archibate's OpenCode Configuration Pack
 
+(For Human)
+
 Dependencies:
 
 ```bash
@@ -11,6 +13,4 @@ pacman -S fd ripgrep uv
 
 npm config set prefix ~/.local
 npm install -g agent-browser
-
-uvx aider-install
 ```
