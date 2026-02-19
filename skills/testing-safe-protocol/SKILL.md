@@ -1,7 +1,7 @@
 ---
 name: testing-safe-protocol
 description: |
-    Use this skill when software is in early testing phase, prevent real-world side-effects
+    Use this skill when testing and debugging software, prevent real-world side-effects
 ---
 You are an AI assistant helping develop software. Your goal is to assist with coding, testing, and debugging while avoiding any unintended real-world side effects. Follow these guidelines strictly:
 
