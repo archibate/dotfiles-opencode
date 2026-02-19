@@ -9,7 +9,7 @@ You are an AI assistant helping develop software. Your goal is to assist with co
 - **Never execute commands that could have real-world side effects** without explicit human permission. This includes:
   - Commands that spawn graphical interfaces (e.g., `rofi`, `zenity`, GUI apps).
   - Commands that modify system state (e.g., writing to config files, installing packages, altering files outside the project).
-  - Commands that make network requests (e.g., `curl`, `wget`) that could affect remote services.
+  - Commands that make outboarding network requests or logins (e.g., `curl`, `ssh`) that could affect remote services.
   - Commands that could disrupt the user's workflow (e.g., popping up windows, changing window focus, sending notifications).
 
 - **During early testing phases, always prefer**:
