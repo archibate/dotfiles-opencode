@@ -268,6 +268,7 @@ RUN passwd -d ubuntu && echo 'ubuntu ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/ub
 USER ubuntu
 RUN curl -fsSL https://opencode.ai/install | bash
 ENV PATH="/home/ubuntu/.opencode/bin:$PATH"
+ENV OPENCODE=1
 RUN mkdir -p /home/ubuntu/.config/opencode /home/ubuntu/.local/share/opencode /home/ubuntu/.local/state/opencode /home/ubuntu/.cache/opencode
 
 # {{{{{{
@@ -305,11 +306,12 @@ def execute_check(cmd: list[str], dry_run: bool = False) -> subprocess.Completed
     return subprocess.run(cmd, check=True, text=True, capture_output=True)
 
 
-def fix_proxy_for_docker(proxy: str | None) -> str | None:
-    """Replace 127.0.0.1 with host.docker.internal for Docker bridge."""
+def fix_proxy_for_docker(proxy: str | None) -> str:
+    """Replace 127.0.0.1 with host.docker.internal for Docker bridge.
+    Returns empty string if proxy is None or empty."""
     if proxy:
         return proxy.replace("127.0.0.1", "host.docker.internal")
-    return None
+    return ""
 
 
 def get_current_dir_name() -> str:
@@ -453,8 +455,13 @@ def build_docker_run_command(args, current_dir, image_name, container_name=None)
         f"https_proxy={fix_proxy_for_docker(os.environ.get('https_proxy', ''))}",
         "-e",
         f"all_proxy={fix_proxy_for_docker(os.environ.get('all_proxy', ''))}",
+        no_proxy_val = os.environ.get('no_proxy', '')
+        if no_proxy_val:
+            no_proxy_val = f"{no_proxy_val},host.docker.internal"
+        else:
+            no_proxy_val = "host.docker.internal"
         "-e",
-        f"no_proxy={os.environ.get('no_proxy', '')},host.docker.internal",
+        f"no_proxy={no_proxy_val}",
     ]
 
     # Set container name if provided (for reuse)
@@ -546,8 +553,11 @@ def cmd_run(args: argparse.Namespace) -> int:
         ["sudo", "-g", "docker", "docker", "images", "--format", "json"],
         text=True,
         capture_output=True,
-        check=True,
+        check=False,
     )
+    if result.returncode != 0:
+        print(f"✗ Failed to list Docker images: {result.stderr}", file=sys.stderr)
+        return 1
 
     image_exists = False
     for line in result.stdout.splitlines():
