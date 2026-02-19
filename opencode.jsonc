@@ -155,6 +155,11 @@
         //         }
         //     },
         // },
+        "openrouter": {
+            "options": {
+                "apiKey": "{env:OPENROUTER_API_KEY}"
+            }
+        },
         "deepseek": {
             "options": {
                 "apiKey": "{env:DEEPSEEK_API_KEY}"
