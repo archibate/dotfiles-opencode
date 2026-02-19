@@ -173,7 +173,8 @@
     },
     "theme": "tokyonight",
     // "model": "deepseek/deepseek-reasoner",
-    "model": "zhipuai-coding-plan/glm-5",
+    // "model": "zhipuai-coding-plan/glm-5",
+    "model": "openrouter/anthropic/claude-haiku-4.5",
     "small_model": "zhipuai-coding-plan/glm-4.5-air",
     "default_agent": "quick",
     "mcp": {
