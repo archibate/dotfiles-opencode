@@ -268,7 +268,6 @@ RUN passwd -d ubuntu && echo 'ubuntu ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/ub
 USER ubuntu
 RUN curl -fsSL https://opencode.ai/install | bash
 ENV PATH="/home/ubuntu/.opencode/bin:$PATH"
-ENV OPENCODE=1
 RUN mkdir -p /home/ubuntu/.config/opencode /home/ubuntu/.local/share/opencode /home/ubuntu/.local/state/opencode /home/ubuntu/.cache/opencode
 
 # {{{{{{
@@ -432,6 +431,13 @@ def get_container_status(container_name: str) -> str:
 
 def build_docker_run_command(args, current_dir, image_name, container_name=None):
     """Build docker run command with appropriate options."""
+    # Calculate no_proxy_val before building the command list
+    no_proxy_val = os.environ.get('no_proxy', '')
+    if no_proxy_val:
+        no_proxy_val = f"{no_proxy_val},host.docker.internal"
+    else:
+        no_proxy_val = "host.docker.internal"
+    
     docker_cmd = [
         "sudo",
         "-g",
@@ -455,11 +461,6 @@ def build_docker_run_command(args, current_dir, image_name, container_name=None)
         f"https_proxy={fix_proxy_for_docker(os.environ.get('https_proxy', ''))}",
         "-e",
         f"all_proxy={fix_proxy_for_docker(os.environ.get('all_proxy', ''))}",
-        no_proxy_val = os.environ.get('no_proxy', '')
-        if no_proxy_val:
-            no_proxy_val = f"{no_proxy_val},host.docker.internal"
-        else:
-            no_proxy_val = "host.docker.internal"
         "-e",
         f"no_proxy={no_proxy_val}",
     ]
