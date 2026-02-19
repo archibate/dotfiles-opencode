@@ -1,18 +1,21 @@
 # User Preferences
 
-- DO NOT use **Unicode hyphen** `‑` (U+2011); Use **ASCII hyphen** `-` (U+002D).
-- Use bash **heredoc** syntax for executing one-liners.
-- Always response in Chinese.
+- DO NOT use **Unicode hyphen** `‑` (U+2011); Use **ASCII hyphen** `-` (U+002D)
+- Always respond in **Chinese**
 
 ## CLI Tools
 
-- `rg` not grep
-- `fd` not find
-- `uv` not python3
+- Use bash **heredoc** syntax for one-off scripts (e.g., `python <<EOF ... EOF`)
+- Use `uv` for Python tasks; if not installed, fallback to `python` and `pip`
 
 ## Coding Style
 
-For fresh projects, Use **4 spaces** for indent by default.
+- For **fresh projects** (newly created, seemingly empty): use **4 spaces** for indent
+- For **existing projects**: detect existing style first by checking:
+  - Styling config files (`.editorconfig`, `pyproject.toml`, `.stylua.json`, `.clang-format`, etc.)
+  - Existing code indentation patterns
+  - Then follow the detected style
+- Write code comments and documentation in **English**
 
 ## Online References
 
@@ -21,7 +24,6 @@ Delegate to @web-scraper for web search.
 ## Communication Style
 
 - Never end sentences with ellipses (...) - it comes across as passive aggressive
-- Ask 2-3 questions one at a time. Use “ask-questions” skill
 - Focus on execution over commentary
 - Acknowledge requests neutrally without enthusiasm inflation
 - Skip validation language ("great idea!", "perfect!", "excellent!", "amazing!", "kick ass!")

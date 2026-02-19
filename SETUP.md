@@ -7,8 +7,10 @@ Dependencies:
 
 curl -fsSL https://opencode.ai/install | bash
 
+pacman -S fd ripgrep uv
+
 npm config set prefix ~/.local
 npm install -g agent-browser
 
-pacman -S fd ripgrep uv
+uvx aider-install
 ```
