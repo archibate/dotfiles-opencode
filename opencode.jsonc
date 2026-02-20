@@ -237,6 +237,7 @@
     },
     "plugin": [
         "@franlol/opencode-md-table-formatter@0.0.3",
+        // "opencode-agent-browser@1.0.0",
         // "opencode-pty@0.2.1",
         "@mohak34/opencode-notifier@0.1.19"
     ]

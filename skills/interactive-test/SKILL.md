@@ -29,7 +29,7 @@ Heres are the common solutions:
     - If non-interactive test passed:
         - Check if its necessary for interactive test.
         - Use browser automation tools for headless interactive test.
-        - Capture screenshot using browser automation tools (save in `/tmp`), then read saved image for vision analysis (if the agent have vision capbility).
+        - Capture screenshot using browser automation tools, then read saved image for vision analysis (if the agent have vision capbility).
 
 - Traditional local GUI (e.g. Qt, Pygame):
     - If the project offers standard unit tests for non-interactive functionalities, run that first.
