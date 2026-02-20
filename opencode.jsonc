@@ -4,6 +4,45 @@
         "mcp_timeout": 120000
     },
     "provider": {
+        "ollama": {
+            "models": {
+                "qwen3:8b": {
+                    "attachment": true,
+                    "reasoning": true,
+                    "temperature": true,
+                    "tool_call": true,
+                    "options": {
+                        "temperature": 0.2,
+                        "num_ctx": 40960
+                    },
+                    "limit": {
+                        "context": 40960,
+                        "output": 8192
+                    },
+                    "name": "qwen3:8b"
+                },
+                "qwen3-coder": {
+                    "attachment": true,
+                    "reasoning": true,
+                    "temperature": true,
+                    "tool_call": true,
+                    "options": {
+                        "temperature": 0.2,
+                        "num_ctx": 81920
+                    },
+                    "limit": {
+                        "context": 81920,
+                        "output": 16384
+                    },
+                    "name": "qwen3-coder"
+                }
+            },
+            "name": "Ollama (local)",
+            "npm": "@ai-sdk/openai-compatible",
+            "options": {
+                "baseURL": "http://127.0.0.1:11434/v1"
+            }
+        },
         // "n1n": {
         //     "npm": "@ai-sdk/openai-compatible",
         //     "name": "N1N.AI",

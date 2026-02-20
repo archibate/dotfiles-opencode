@@ -178,7 +178,8 @@ When beginning a conversation: Review all available skills and use any that are 
 
 - Use **setup-fresh-project** skill if starting a fresh project.
 - Use **installing-dependencies** skill when installing any dependency, package, or tool.
-- Use **tdd-workflow** skill if TDD is applicable.
+- Use **tdd-workflow** skill if using TDD.
+- Use **testing-safe-protocol** skill for safety caveats in testing.
 - Use **mistake-notebook** skill to learn from historical problems.
 
 When writing task list, think if each task requires any skills. Add relevant skills to the `skills` array in each task object. For example:
