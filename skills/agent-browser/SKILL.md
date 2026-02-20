@@ -7,6 +7,22 @@ description: Use this skill for browser automation.
 
 A CLI tool for browser automation. It maintains a persistent browser session with cookies - login once and stay authenticated across all subsequent navigations.
 
+## Before You Start
+
+### Use agent-browser only for interaction
+For reading or fetching web content, prefer standard web search and
+fetch tools. Use agent-browser only when the task requires interaction:
+clicking, form submission, or stateful navigation.
+
+### Subagent safety gate
+If running as a subagent, you MUST load the `testing-safety-protocol`
+skill before using agent-browser. Only proceed if the protocol permits.
+If it does not permit, stop and do not use agent-browser.
+
+### --headed
+- Primary agent (interactive session with user): always `--headed`
+- Subagent: headless by default; use `--headed` only if explicitly instructed
+
 ## Prerequisites
 
 If `agent-browser` is not installed, it is a system-level CLI tool. Load the `installing-dependencies` skill, inform the user what needs to be installed and where it writes, and wait for explicit permission before proceeding.
@@ -24,12 +40,14 @@ agent-browser session list --json              # List all active sessions
 
 ```bash
 # First open: reset any stale state, then set a consistent viewport
-agent-browser close && agent-browser open https://example.com --headed
+agent-browser close && agent-browser open https://example.com [--headed]
 agent-browser set viewport 1920 1080
 
 # Subsequent navigations: just open, cookies are preserved
-agent-browser open https://example.com/dashboard --headed
+agent-browser open https://example.com/dashboard [--headed]
 ```
+
+`--headed` follows the decision in "Before You Start".
 
 ### Browser settings
 
@@ -172,7 +190,7 @@ agent-browser eval "document.title"                  # Any JS expression
 For form-based login:
 
 ```bash
-agent-browser open https://example.com/login --headed
+agent-browser open https://example.com/login [--headed]
 agent-browser snapshot -i --json
 agent-browser fill @eUsername "user@example.com"
 agent-browser fill @ePassword "secret"
@@ -185,7 +203,7 @@ For token-based APIs or localized content, inject headers before navigating:
 ```bash
 agent-browser set headers '{"Authorization": "Bearer <token>"}'
 agent-browser set headers '{"Accept-Language": "zh-CN"}'
-agent-browser open https://example.com/api/resource --headed
+agent-browser open https://example.com/api/resource [--headed]
 ```
 
 ## Debugging
