@@ -386,8 +386,8 @@
         }
     },
     "plugin": [
-        // "@franlol/opencode-md-table-formatter@0.0.3",
+        "@franlol/opencode-md-table-formatter@0.0.3",
         // "opencode-pty@0.2.1",
-        // "@mohak34/opencode-notifier@0.1.19"
+        "@mohak34/opencode-notifier@0.1.19"
     ]
 }

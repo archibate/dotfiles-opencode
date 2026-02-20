@@ -40,4 +40,6 @@ Heres are the common solutions:
 
 TUI Applications typically interacts with terminal key strokes.
 
-Use the `pty_*` tool for starting TUI applications and send key strokes.
+The builtin `bash` tool does not allow interactive TTY/PTY.
+
+Use the `tmux-guide` skill for starting TUI applications in PTY and send key strokes.
