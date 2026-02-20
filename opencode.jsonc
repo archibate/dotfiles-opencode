@@ -310,7 +310,7 @@
                 "Z_AI_MODE": "ZHIPU",
                 "Z_AI_API_KEY": "{env:Z_AI_API_KEY}"
             },
-            "enabled": true
+            "enabled": false,
         },
         "web-search-prime": {
             "type": "remote",
@@ -318,7 +318,7 @@
             "headers": {
                 "Authorization": "Bearer {env:Z_AI_API_KEY}"
             },
-            "enabled": true
+            "enabled": false,
         },
         "web-reader": {
             "type": "remote",
@@ -326,7 +326,7 @@
             "headers": {
                 "Authorization": "Bearer {env:Z_AI_API_KEY}"
             },
-            "enabled": true
+            "enabled": false,
         },
         "zread": {
             "type": "remote",
@@ -334,7 +334,7 @@
             "headers": {
                 "Authorization": "Bearer {env:Z_AI_API_KEY}"
             },
-            "enabled": true
+            "enabled": false,
         },
         "playwright": {
             "type": "local",
@@ -342,7 +342,7 @@
                 "npx",
                 "@playwright/mcp@latest"
             ],
-            "enabled": true
+            "enabled": false,
         },
         "context7": {
             "type": "local",
@@ -353,7 +353,7 @@
                 "--api-key",
                 "{env:CONTEXT7_API_KEY}"
             ],
-            "enabled": true
+            "enabled": false,
         },
         "chrome-devtools": {
             "type": "local",
@@ -369,7 +369,7 @@
         "grep": {
             "type": "remote",
             "url": "https://mcp.grep.app",
-            "enabled": true
+            "enabled": false,
         }
     },
     "permission": {
@@ -386,8 +386,8 @@
         }
     },
     "plugin": [
-        "@franlol/opencode-md-table-formatter@0.0.3",
-        "opencode-pty@0.2.1",
-        "@mohak34/opencode-notifier@0.1.19"
+        // "@franlol/opencode-md-table-formatter@0.0.3",
+        // "opencode-pty@0.2.1",
+        // "@mohak34/opencode-notifier@0.1.19"
     ]
 }

@@ -281,7 +281,7 @@ wc -w skills/path/SKILL.md
 
 Use skill name only, with explicit requirement markers:
 - ✅ Good: `**REQUIRED SUB-SKILL:** Use tdd-workflow`
-- ✅ Good: `**REQUIRED BACKGROUND:** You MUST understand superpowers:systematic-debugging`
+- ✅ Good: `**REQUIRED BACKGROUND:** You MUST understand systematic-debugging`
 - ❌ Bad: `See tdd-workflow` (unclear if required)
 - ❌ Bad: `@tdd-workflow/SKILL.md` (force-loads, burns context)
 

@@ -1,6 +1,6 @@
 ---
 name: installing-dependencies
-description: Use when installing dependencies, packages, or tools required for a project.
+description: Use before installing dependencies, packages, or tools required for building project.
 ---
 
 # Installing Dependencies

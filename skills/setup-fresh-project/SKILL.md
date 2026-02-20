@@ -101,9 +101,3 @@ If this is to be a public project (potentially upload to github), not for person
 - Make sure no hard-coded user path (e.g. `/home/bate/project`) in `README.md` and other documents.
 - Make sure no invalid fake link used in `README.md` and other documents (e.g. `[Screenshot](screenshot.png)` but actually no such file).
 - Make sure no hard-coded user credentials (e.g. API keys, tokens, or password) in any files tracked by git.
-
-## For Spec-Orchestrator
-
-If you are the Spec-Orchestrator agent:
-
-Do not execute the setup yourself. Write these requirements for a fresh-project into a individual spec namely `fresh-project-setup.md`, to enforce project development quality-of-life (e.g. having a `.gitignore`, having formatter and LSP working) infrastructures always work across spec-driven development workflows.
