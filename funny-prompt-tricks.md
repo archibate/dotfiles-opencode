@@ -10,6 +10,7 @@ Good:
 - search web for ...
 - investigate ...
 - explain ...
+- make a commit
 
 LLMs follow instructions best when they are unambiguous and ordered. A strict task list outperforms lengthy philosophical advice.
 
@@ -154,7 +155,7 @@ You totally have no control over it. You don't even know if GLM will execute the
 Insight: when requesting changes:
 
 1. provide context, e.g. I'm making frontend design / doing prompt engineering. 'workflow' can have different meaning in prompt engineering and frontend.
-2. what you've already done in the codebase (manually or by vibe coding).
+2. what you've already done in the codebase (no matter manually or by vibe coding).
 
 This prevents GLM from misunderstanding your intent.
 
@@ -285,7 +286,7 @@ Good: write a test case (if not have yet) for this function, cover all edge case
 
 ---
 
-Insight: why not try: human write code, AI reviews
+Insight: try this: human write code, AI reviews
 
 actually I find LLM preforms code review very well. it always catch my bugs that I didn't even notice, points out undefinied behaviors in C++, English grammar issues and typos.
 
@@ -295,10 +296,34 @@ actually some statistics shows that programers take 80% of their time in testing
 
 no 'shame' to insist write code manually in the age of 'AI hype', especially for code requiring highly skilled domain knowledge. by writing code yourself, verifying with AI, you are actually speeding up the '80%' of work time with AI power!
 
-after all, writing code is small (user request) -> big (full code), suffering from dimension diaster, can easily get hallucinated; code review is big (full code) -> small (classify good or not), which has long been a solid industral scenario for NLPs to act as classifiers, before autoregressive LLMs have been invented. classification has always been the most robust AI model target all the ways.
+this flips the typical 'AI writes, human reviews' pattern and leverages the model's strength as a critic.
+
+writing code is small (user request) -> big (full code), suffering from the well-known 'dimension diaster', can easily get hallucinated; code review is big (full code) -> small (classify good or not), which has long been a solid industral scenario for NLPs to act as classifiers, before autoregressive LLMs have been invented. classification has always been the most robust AI model target all the ways.
 
 ---
 
-Insight: create a fresh conversation for each request, no "Middle Ages Auntie's Foot Wrap".
+Insight: create a fresh conversation for each task
 
-...
+just start a new conversation (session) for every new task.
+
+do not try to keep a 'god session' where all your works are done in, as if you are raising a baby.
+
+LLMs are poor in memory, they are stateless autoregressive next token predictors based on all previous context. it can't memorize more beyond context window. even if context window is huge (1M for some top models), only a tiny fraction of context is remain active thanks to the attention mechanism - otherwise would suffer O(n^2) complicity diaster making LLMs impossible to train. the acutally useful context highly sparse, while you still have to pay money (and latency) for all of them at equal price.
+
+knowledge is severely lost during the compaction when context is full, the agent basically needs to explore the codebase from scratch to get back necessary context for continue task, so we should try our best to prevent from making context long enough to have to trigger compaction.
+
+keep persistent knowledge in documents and codes, not by conversation context. conversation is meant to be one-off use, long-term memory must solidates to filesystem for future agent to explore and recover.
+
+---
+
+Insight: make commits using agent
+
+just say: make a commit
+
+and GLM will automatically stage the correct files, skip the binary artifact files, review what is changed, make a commit with a clear message following github community best pratices.
+
+Since opencode has a CLI usage, you can actually make an alias:
+
+alias commit='opencode run "stage unstaged files, create or update .gitignore if necessary, make a commit with a clear multiline message following github community best pratices, do not modify code, do not ask"'
+
+This removes all pain in tackling stupid files, maintaining gitignore file and thinking hard writing commit message for me. GLM is working well in these simple daily dev-ops tasks, since there is nothing to hallucinate.
