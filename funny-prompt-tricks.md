@@ -201,61 +201,6 @@ If CoT did make GLM listed all A, B, C, D explicitly in thinking text, then why 
 
 ---
 
-Insight: when requesting changes:
-
-1. provide context, e.g. I'm making frontend design / doing prompt engineering. 'workflow' can have different meaning in prompt engineering and frontend.
-2. what you've already done in the codebase (no matter manually or by vibe coding).
-
-This prevents GLM from misunderstanding your intent.
-
-Good: I'm doing prompt engineering, I created a brainstorm agent system prompt: @agent/brainstorm.md . I notice that the brainstorm agent tends to not executing read-only commands exploring my local environment to gather information, instead it tends to ask me about information (e.g. are you using linux or windows? ubuntu or archlinux?), which is bad. I need to inform it that I permit it to run read-only bash commands to understand existing project codebase and computer environment, as long as not modifying them. how can I write concise prompt to convey these intents
-
-GLM understand my intent: my role is act as a prompt engineer, the user ask me to edit the system prompt of a 'brainstorm' agent..
-
-Bad: @agent/brainstorm.md make it not asking me OS information, discover OS information automatically.
-
-GLM could think: do you want me to roleplay the brainstorm agent? Ok, I won't asking you about OS information in this conversation! let me run uname -a to get your OS information now..
-
----
-
-Insight: making commits by agent is low-risk and time-saving
-
-just say: make a commit
-
-and GLM will automatically stage the correct files, skip the binary artifact files, review what is changed, make a commit with a clear message following github community best pratices.
-
-Since opencode has a CLI usage, you can actually make an alias:
-
-alias commit='opencode run "stage unstaged files, create or update .gitignore if necessary, make a commit with a clear multiline message following github community best pratices, do not modify code, do not ask"'
-
-This removes all pain in tackling stupid files, maintaining gitignore file and thinking hard writing commit message for me. GLM is working well in these simple daily dev-ops tasks, since there is nothing to hallucinate.
-
----
-
-Insight: Use a list of impretive verbs - especially when defining long-term workflows to be ran in background without human interception
-
-a clear step by step guide makes GLM easy to follow, no ambiguity, no overinterpretation.
-
-only speak of related context in prompt, no additionally adding anything could confusing GLM.
-
-Bad: the X function is reluctant since it is no longer used in Y and Z module, we can use X2 instead in W module freely I think.
-
-Good: remove the X function in Y module. check for references of symbol X.
-
-An extensive example of 'a list of impretive verbs' is defining a workflow, as I done in agent/executor.md and skills/tdd-workflow/SKILL.md. a strict steps to follow, is way better than tons technical preach.
-
-'superpowers' and 'oh-my-opencode' (totally hype, I uninstalled it in 1 day) are great bad examples in my view of prompt engineering - see https://github.com/obra/superpowers/blob/main/skills/test-driven-development/SKILL.md, it write tons of 'iron raw', 'ALL CAPITCAL', fancy memraids, but never define a clear steps for LLM to follow - totally self perceived preaching, as if a talkative stupid professor is preaching a human fellow, tons of shits wasting your tokens.
-
-If your only got a blurry idea, cannot form a clear list of steps in your mind:
-
-first talk with GLM to brainstorm, prompt it to discuss possbility and feasibility only, not execute.
-
-when idea is clearified, ask GLM to create a list of steps in impretive mood (with 'show the list of steps, no execute' postfix). then you confirm these steps, and say 'execute.'
-
-This would be way more effcient than directly tell GLM the idea to execute without discussing to produce a concrete list of steps.
-
----
-
 Insight: Do not explain why to LLMs
 
 a common mistake is keep explaining 'why I need this change' to LLMs, which turns out to be wasting your time typing. actually LLMs have no memory beyond each conversation - you have just hallucinated to view LLMs as your human workmates, you try teaching them as if they would remember your skill - no, each conversation is a fresh clone of existing GLM model, it will never remember your previous dedicated tech course you taught.
@@ -285,6 +230,48 @@ Insight: Mention (@) any relevant documents as context explicitly, instead of 'p
 
 If a document or code file is obviously required to correctly accomplish your task, you'd better mention them explicitly using the @ symbol.
 otherwise you would have to 'pray' the agent is able to discover this document itself, purely by chance.
+
+---
+
+Insight: when requesting changes:
+
+1. provide context, e.g. I'm making frontend design / doing prompt engineering. 'workflow' can have different meaning in prompt engineering and frontend.
+2. what you've already done in the codebase (no matter manually or by vibe coding).
+
+This prevents GLM from misunderstanding your intent.
+
+Good: I'm doing prompt engineering, I created a brainstorm agent system prompt: @agent/brainstorm.md . I notice that the brainstorm agent tends to not executing read-only commands exploring my local environment to gather information, instead it tends to ask me about information (e.g. are you using linux or windows? ubuntu or archlinux?), which is bad. I need to inform it that I permit it to run read-only bash commands to understand existing project codebase and computer environment, as long as not modifying them. how can I write concise prompt to convey these intents
+
+GLM understand my intent: my role is act as a prompt engineer, the user ask me to edit the system prompt of a 'brainstorm' agent..
+
+Bad: @agent/brainstorm.md make it not asking me OS information, discover OS information automatically.
+
+GLM could think: do you want me to roleplay the brainstorm agent? Ok, I won't asking you about OS information in this conversation! let me run uname -a to get your OS information now..
+
+
+---
+
+Insight: Use a list of impretive verbs - especially when defining long-term workflows to be ran in background without human interception
+
+a clear step by step guide makes GLM easy to follow, no ambiguity, no overinterpretation.
+
+only speak of related context in prompt, no additionally adding anything could confusing GLM.
+
+Bad: the X function is reluctant since it is no longer used in Y and Z module, we can use X2 instead in W module freely I think.
+
+Good: remove the X function in Y module. check for references of symbol X.
+
+An extensive example of 'a list of impretive verbs' is defining a workflow, as I done in agent/executor.md and skills/tdd-workflow/SKILL.md. a strict steps to follow, is way better than tons technical preach.
+
+'superpowers' and 'oh-my-opencode' (totally hype, I uninstalled it in 1 day) are great bad examples in my view of prompt engineering - see https://github.com/obra/superpowers/blob/main/skills/test-driven-development/SKILL.md, it write tons of 'iron raw', 'ALL CAPITCAL', fancy memraids, but never define a clear steps for LLM to follow - totally self perceived preaching, as if a talkative stupid professor is preaching a human fellow, tons of shits wasting your tokens.
+
+If your only got a blurry idea, cannot form a clear list of steps in your mind:
+
+first talk with GLM to brainstorm, prompt it to discuss possbility and feasibility only, not execute.
+
+when idea is clearified, ask GLM to create a list of steps in impretive mood (with 'show the list of steps, no execute' postfix). then you confirm these steps, and say 'execute.'
+
+This would be way more effcient than directly tell GLM the idea to execute without discussing to produce a concrete list of steps.
 
 ---
 
