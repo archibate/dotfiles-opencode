@@ -347,6 +347,7 @@ Each task object MUST conform to these strict rules:
 - **Constraint**: No duplicates, only include skills directly applicable to this task
 - **Common skill values**:
   - `tdd-workflow` (when TDD is applicable)
+  - `testing-safe-protocol` (whenever tests are involved)
   - `systematic-debugging` (when debugging is expected)
   - `setup-fresh-project` (for new project initialization)
   - `installing-dependencies` (when installing any dependency, package, or tool)
@@ -355,6 +356,9 @@ Each task object MUST conform to these strict rules:
 - **Invalid Examples** (❌):
   - `["tdd", "debugging"]` (non-standard names)
   - `["tdd-workflow", "tdd-workflow"]` (duplicates)
+- **Common Skill Decisions**:
+  - First task -> `setup-fresh-project`, `verification-before-completion`
+  - Task with testing cases -> `tdd-workflow`, `testing-safe-protocol`
 
 ### `complete` Field
 - **Type**: Boolean

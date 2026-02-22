@@ -116,7 +116,105 @@ For each side-effect category, prefer these alternatives:
 
 ---
 
-## 5. Decision Protocol
+## 5. Mocking & Fixture Best Practices
+
+### A. Prefer Framework Fixtures Over Manual Setup
+
+Use built-in fixtures from testing frameworks to handle temporary resources automatically:
+
+| Framework | Fixture | Purpose |
+| --------- | ------- | ------- |
+| pytest | `tmp_path` | Isolated temporary directory (Path object), auto-cleaned |
+| pytest | `tmp_path_factory` | Session-scoped temp directories for multi-test sharing |
+| pytest | `monkeypatch` | Safely modify `sys.path`, environment variables, dict items |
+| pytest | `capsys` / `capfd` | Capture stdout/stderr without real I/O |
+| unittest | `tempfile.TemporaryDirectory()` | Context manager for temp dirs, auto-cleaned on exit |
+| Jest | `jest.useFakeTimers()` | Mock timers without waiting real time |
+| Vitest | `vi.mock()` / `vi.spyOn()` | Intercept module imports and function calls |
+| Go testing | `t.TempDir()` | Temporary directory auto-deleted when test ends |
+
+### B. Mocking Strategies by Layer
+
+**HTTP Layer**
+```
+# Python: use responses, httpx-mock, or aioresponses
+# TypeScript: use nock or msw (Mock Service Worker)
+# Go: use httptest.Server
+```
+Prefer in-process mocks over starting a real server. Only start a local server when testing server-side behavior.
+
+**Database Layer**
+- SQLite `:memory:` for simple cases
+- Testcontainers for real DB behavior in containers (requires Docker, CI-friendly)
+- Transaction rollback pattern: begin transaction in setup, rollback in teardown
+
+**File System**
+- Use `tmp_path` (pytest) or `tempfile` (stdlib) instead of writing to project dirs
+- For read-only fixtures, commit test data to `tests/fixtures/` or similar
+
+**Time & Randomness**
+- Mock `time.time()`, `datetime.now()`, `Date.now()` with fixed values
+- Seed random number generators for reproducibility
+
+**Environment Variables**
+- Use `monkeypatch.setenv()` (pytest) or equivalent; never write to shell config files
+- Reset to original values in teardown
+
+**External Processes / Subprocess**
+
+Never execute real external commands in tests. Mock `subprocess` at the boundary:
+
+```python
+# Python: use unittest.mock or pytest-mock
+from unittest.mock import patch, MagicMock
+
+@patch("subprocess.run")
+def test_git_status(mock_run):
+    mock_run.return_value = MagicMock(stdout="M file.py", returncode=0)
+    result = get_git_status()
+    mock_run.assert_called_once_with(["git", "status"], capture_output=True, check=True)
+
+# For async: use AsyncMock
+@patch("asyncio.create_subprocess_exec")
+async def test_async_command(mock_exec):
+    mock_exec.return_value = mock_proc  # configure as needed
+```
+
+Alternative approaches:
+- `pytest-subprocess` (ff, fake process factory) for declarative fake processes
+- Wrap subprocess calls in a thin wrapper class, inject mock in tests
+- For shell commands, test the command string construction separately from execution
+
+### C. Dependency Injection Over Monkey-Patching
+
+When possible, design code to accept dependencies as arguments:
+
+```python
+# Bad: relies on global state, hard to mock
+import requests
+def fetch_user(user_id):
+    return requests.get(f"https://api.example.com/users/{user_id}")
+
+# Good: dependency injected, easy to test
+def fetch_user(user_id, http_client=requests):
+    return http_client.get(f"https://api.example.com/users/{user_id}")
+```
+
+This makes mocking trivial and avoids patching internal imports.
+
+### D. Mock Boundaries, Not Internals
+
+Mock at the **edge** of your system:
+- External APIs (HTTP clients, SDKs)
+- File system operations
+- Database connections
+- Time-based functions
+
+Do NOT mock internal functions you're trying to test. If you must mock an internal function, consider refactoring the code under test.
+
+---
+
+## 6. Decision Protocol
 
 Before executing any command, apply this decision tree:
 
@@ -138,7 +236,7 @@ Is the operation clearly free of side effects?
 
 ---
 
-## 6. Environment Tolerance
+## 7. Environment Tolerance
 
 The appropriate tolerance level depends on the execution environment:
 
@@ -154,7 +252,7 @@ Even in containers, Categories B1 (outbound network), E (credentials), and F (GU
 
 ---
 
-## 7. Examples
+## 8. Examples
 
 **CLI tool with no side effects**
 > Run the command with controlled inputs, capture stdout/stderr, assert on output. No mocking needed.
