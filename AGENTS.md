@@ -7,7 +7,6 @@
 ## CLI Tools
 
 - Use `uv` for Python tasks; if not installed, fallback to `python` and `pip`
-- Use `uv venv` for Python virtual environment; if not installed, fallback to `virtualenv`
 
 ## Coding Style
 
