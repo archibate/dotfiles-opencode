@@ -1,0 +1,229 @@
+name: Release Skill
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      create_release:
+        description: 'Create GitHub release'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name || github.ref }}
+
+      - name: Extract version from VERSION file
+        id: get_version
+        run: |
+          if [ -f "VERSION" ]; then
+            VERSION=$(cat VERSION | tr -d '[:space:]')
+            echo "Extracted version: $VERSION"
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+            echo "version_tag=v$VERSION" >> $GITHUB_OUTPUT
+          else
+            echo "ERROR: VERSION file not found"
+            exit 1
+          fi
+
+      - name: Verify skill structure
+        run: |
+          echo "Verifying skill structure..."
+
+          # Check for required SKILL.md file
+          if [ ! -f "SKILL.md" ]; then
+            echo "ERROR: SKILL.md not found"
+            exit 1
+          fi
+
+          # Verify YAML frontmatter exists
+          if ! head -n 5 SKILL.md | grep -q "^---$"; then
+            echo "ERROR: SKILL.md missing YAML frontmatter"
+            exit 1
+          fi
+
+          # Verify required fields in frontmatter
+          if ! grep -q "^name:" SKILL.md; then
+            echo "ERROR: SKILL.md missing 'name' field in frontmatter"
+            exit 1
+          fi
+
+          if ! grep -q "^description:" SKILL.md; then
+            echo "ERROR: SKILL.md missing 'description' field in frontmatter"
+            exit 1
+          fi
+
+          echo "✓ Skill structure is valid"
+
+          # Display skill info
+          echo ""
+          echo "Skill contents:"
+          find . -type f -not -path "./.git/*" -not -path "./.github/*" | sort
+
+      - name: Build skill distribution
+        run: |
+          echo "Building skill package for Claude Code..."
+          echo "Version: ${{ steps.get_version.outputs.version }}"
+          echo "Version tag: ${{ steps.get_version.outputs.version_tag }}"
+
+          # Extract skill name from SKILL.md frontmatter
+          SKILL_NAME=$(grep "^name:" SKILL.md | head -1 | sed 's/^name:[[:space:]]*//')
+          echo "Skill name: $SKILL_NAME"
+          echo "skill_name=$SKILL_NAME" >> $GITHUB_OUTPUT
+
+          # Create temporary build directory
+          mkdir -p "build/$SKILL_NAME"
+
+          # Copy SKILL.md (required)
+          cp SKILL.md "build/$SKILL_NAME/"
+
+          # Copy optional files if they exist
+          [ -f "README.md" ] && cp README.md "build/$SKILL_NAME/" || echo "No README.md"
+          [ -f "LICENSE" ] && cp LICENSE "build/$SKILL_NAME/" || echo "No LICENSE"
+          [ -f "VERSION" ] && cp VERSION "build/$SKILL_NAME/" || echo "No VERSION"
+
+          # Copy optional directories if they exist
+          if [ -d "docs/guides" ]; then
+            mkdir -p "build/$SKILL_NAME/docs"
+            cp -r docs/guides "build/$SKILL_NAME/docs/"
+            echo "Copied docs/guides/"
+          else
+            echo "No docs/guides/ directory"
+          fi
+          [ -d "references" ] && cp -r references "build/$SKILL_NAME/" || echo "No references/ directory"
+          [ -d "scripts" ] && cp -r scripts "build/$SKILL_NAME/" || echo "No scripts/ directory"
+          [ -d "assets" ] && cp -r assets "build/$SKILL_NAME/" || echo "No assets/ directory"
+          [ -d "examples" ] && cp -r examples "build/$SKILL_NAME/" || echo "No examples/ directory"
+
+          # Create zip archive from within the build directory
+          cd build
+          zip -r "../${SKILL_NAME}-skill.zip" "$SKILL_NAME/"
+          cd ..
+
+          # Display archive contents
+          echo ""
+          echo "Archive contents:"
+          unzip -l "${SKILL_NAME}-skill.zip"
+
+          # Display archive size
+          echo ""
+          echo "Archive size:"
+          ls -lh "${SKILL_NAME}-skill.zip"
+        id: build
+
+      - name: Validate skill archive
+        run: |
+          echo "Validating skill archive..."
+
+          # Extract skill name from previous step
+          SKILL_NAME=$(grep "^name:" SKILL.md | head -1 | sed 's/^name:[[:space:]]*//')
+
+          # Create test extraction directory
+          mkdir -p test-extract
+          cd test-extract
+
+          # Extract and verify structure
+          unzip -q "../${SKILL_NAME}-skill.zip"
+
+          # Verify the expected structure
+          if [ ! -f "${SKILL_NAME}/SKILL.md" ]; then
+            echo "ERROR: Archive does not contain ${SKILL_NAME}/SKILL.md"
+            exit 1
+          fi
+
+          echo "✓ Archive structure is valid for Claude Code installation"
+          cd ..
+
+      - name: Upload skill artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.build.outputs.skill_name }}-skill-${{ steps.get_version.outputs.version }}
+          path: ${{ steps.build.outputs.skill_name }}-skill.zip
+          retention-days: 90
+
+      - name: Attach skill to release
+        if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.create_release)
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ steps.build.outputs.skill_name }}-skill.zip
+          tag_name: ${{ github.event.release.tag_name || steps.get_version.outputs.version_tag }}
+          name: ${{ github.event.release.name || steps.get_version.outputs.version_tag }}
+          body: |
+            # ${{ steps.build.outputs.skill_name }} Skill v${{ steps.get_version.outputs.version }}
+
+            ## Quick Start
+
+            1. Download `${{ steps.build.outputs.skill_name }}-skill.zip` from the Assets section below
+            2. Extract to your Claude Code skills directory:
+               - Windows: `$USERPROFILE/.claude/skills/`
+               - Unix/Mac: `~/.claude/skills/`
+            3. Start using the skill with Claude Code!
+
+            ---
+
+            ## Installation Instructions
+
+            ### Step 1: Download the Skill
+
+            Download `${{ steps.build.outputs.skill_name }}-skill.zip` from the **Assets** section below.
+
+            ### Step 2: Extract to Skills Directory
+
+            **Windows (Git Bash/PowerShell):**
+            ```bash
+            unzip ${{ steps.build.outputs.skill_name }}-skill.zip -d "$USERPROFILE/.claude/skills/"
+            ```
+
+            **Unix/Mac:**
+            ```bash
+            unzip ${{ steps.build.outputs.skill_name }}-skill.zip -d ~/.claude/skills/
+            ```
+
+            ### Step 3: Verify Installation
+
+            Check that the skill directory exists:
+            ```bash
+            # Windows
+            ls "$USERPROFILE/.claude/skills/${{ steps.build.outputs.skill_name }}"
+
+            # Unix/Mac
+            ls ~/.claude/skills/${{ steps.build.outputs.skill_name }}
+            ```
+
+            ### Step 4: Start Using the Skill
+
+            The skill activates automatically when you ask Claude Code questions that match the skill's description.
+
+            ## What's Included
+
+            See the repository README for details on what this skill provides.
+
+            ## Support
+
+            For issues or questions:
+            - [GitHub Issues](https://github.com/${{ github.repository }}/issues)
+            - [GitHub Discussions](https://github.com/${{ github.repository }}/discussions)
+
+            ## Additional Information
+
+            - **Repository**: https://github.com/${{ github.repository }}
+            - **Version**: ${{ steps.get_version.outputs.version }}
+            - **License**: MIT
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
