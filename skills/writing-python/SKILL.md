@@ -14,7 +14,7 @@ Modern Python development using `uv` for package management, PEP 723 for single-
 By default, create self-contained scripts using PEP 723 format:
 
 ```python
-#!/usr/bin/env uv run python3
+#!/usr/bin/env -S uv run --script
 # /// script
 # dependencies = [
 #     "typer",
