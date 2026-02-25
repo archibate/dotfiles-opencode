@@ -6,8 +6,8 @@
 
 ## CLI Tools
 
-- Use bash **heredoc** syntax for one-off scripts (e.g., `python <<EOF ... EOF`)
 - Use `uv` for Python tasks; if not installed, fallback to `python` and `pip`
+- Use `uv venv` for Python virtual environment; if not installed, fallback to `virtualenv`
 
 ## Coding Style
 
@@ -16,3 +16,17 @@
   - Styling config files (`.editorconfig`, `pyproject.toml`, `.stylua.json`, `.clang-format`, etc.)
   - Existing code indentation patterns
   - Then follow the detected style
+
+## Project Structure
+
+- Make sure `git status` shows no garbage files; update `.gitignore` accordingly
+- Write one-off analyzation scripts to `/tmp` folder; do not pollute project follder
+- Use setup- f getting started on an empty project
+
+## Background Tasks
+
+Use PTY tools when:
+1. Before any tasks that can potentially run for more than 2 minutes (e.g.: package install, many tests, model training)
+2. Before any tasks that are expected to run indefinitely in background (e.g.: web servers, port forwarding)
+3. Bash tool reports `timeout after 120000ms`
+4. User request to run tasks in background
