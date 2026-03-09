@@ -142,7 +142,6 @@
             }
         }
     },
-    "theme": "tokyonight",
     "model": "zhipuai-coding-plan/glm-5",
     // "model": "deepseek/deepseek-reasoner",
     // "model": "openrouter-compatible/anthropic/claude-sonnet-4.6",
