@@ -1,7 +1,6 @@
 ---
 name: color-themes
-description: |
-    A collection of color themes. Use this skill when picking for colors for application.
+description: Color theme palettes for UI/UX design and personal configurations (i3wm, dunst, etc.). Use when user asks to apply color themes like Tokyo Night, needs color palettes for frontend development, or wants to customize terminal/desktop colors.
 ---
 # Color Themes
 

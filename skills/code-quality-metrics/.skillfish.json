@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "name": "code-quality-metrics",
+  "owner": "shabaraba",
+  "repo": "shabaraba-cc-plugins",
+  "path": "packages/dev-org/skills/code-quality-metrics",
+  "branch": "main",
+  "sha": "f1899c2597c7f07f8ef085254a6e124ff1a4a8f2",
+  "source": "manual"
+}

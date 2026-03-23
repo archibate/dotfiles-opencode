@@ -1,6 +1,6 @@
 ---
 name: writing-python
-description: Develop Python projects with uv (PEP 723 inline metadata, venv management, script execution). Use when user mentions uv, creates Python scripts, or needs Python environment setup.
+description: Use this before writing Python code, creating Python scripts, modifying Python files, or when user asks to "write python", "create a python script", "implement in python". TRIGGER when starting any Python development task.
 ---
 
 # Python Development with UV

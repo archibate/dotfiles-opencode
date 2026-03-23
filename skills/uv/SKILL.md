@@ -1,6 +1,6 @@
 ---
 name: uv
-description: This skill should be used when the user asks about UV (Python package manager), needs to set up Python virtual environments, install/manage Python CLI tools, run MCP servers with UVX, decide between uv tool install vs uvx, configure VS Code or IDEs for MCP server integration, migrate from pip/pipx/poetry to UV, or troubleshoot UV-related issues. Use when queries mention UV, UVX, Python package management, virtual environments, MCP servers, tool installation, or Python version management.
+description: Use this skill when using UV (Python package manager), needs to set up Python virtual environments, install/manage Python CLI tools, migrate from pip/pipx to UV, Python version management, or troubleshoot UV-related issues.
 ---
 
 # UV - Python Package Manager Skill
