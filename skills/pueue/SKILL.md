@@ -1,6 +1,6 @@
 ---
 name: pueue
-description: TRIGGER when user mentioned "pueue", "in background". TRIGGER when running non-interactive long-running tasks run for >2 minutes, or any computation intensive tasks.
+description: Comprehensive guide to pueue, a high-performance background task manager. This skill should be used before running non-interactive long-running tasks run for >2 minutes, or needs guidance on the pueue CLI tool usage. TRIGGER when user says "use pueue", "run in background".
 ---
 
 # Pueue
@@ -26,7 +26,11 @@ Pueue is a daemon-based task queue manager. The daemon (`pueued`) runs persisten
     - `-p 4` means allow up to 4 jobs to run concurrently in this group: prevent system resource exhaustion in CPU, memory, I/O
 - Use `pueue add -g [project-name] -- "uv run python -u src/train.py"` to start task in background
     - Important: Python tasks MUST add the option `-u` or set environment `PYTHONUNBUFFERED=1` for real-time output (otherwise would appear stuck)
-- Start `pueue follow [task id]` to wait for task complete
+- Start `pueue follow [task id]` in background:
+    - When task completes, you will receive `<task-notification>` from it
+- Set up a periodical check using `long-waits` skill:
+    - Report task status, progress, ETA in structured output
+    - Prevent task stuck, errors
 
 ---
 
