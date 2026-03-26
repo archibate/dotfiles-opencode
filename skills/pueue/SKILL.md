@@ -1,6 +1,6 @@
 ---
 name: pueue
-description: Comprehensive guide to pueue, a high-performance background task manager. This skill should be used before running non-interactive long-running tasks run for >2 minutes, or needs guidance on the pueue CLI tool usage. TRIGGER when user says "use pueue", "run in background".
+description: This skill should be used before running non-interactive long-running tasks, computation intensive tasks, background tasks, or needs guidance on the pueue CLI tool usage. TRIGGER when user says "use pueue", "run in background".
 ---
 
 # Pueue
@@ -21,16 +21,13 @@ Pueue is a daemon-based task queue manager. The daemon (`pueued`) runs persisten
 
 ## Workflow
 
-- `pueue status` to check if daemon is started, start with `pueued -d`
-- Create a group for current project using `pueue group add -p 4 [project-name]` if not exist yet
-    - `-p 4` means allow up to 4 jobs to run concurrently in this group: prevent system resource exhaustion in CPU, memory, I/O
-- Use `pueue add -g [project-name] -- "uv run python -u src/train.py"` to start task in background
-    - Important: Python tasks MUST add the option `-u` or set environment `PYTHONUNBUFFERED=1` for real-time output (otherwise would appear stuck)
-- Start `pueue follow [task id]` in background:
-    - When task completes, you will receive `<task-notification>` from it
-- Set up a periodical check using `long-waits` skill:
-    - Report task status, progress, ETA in structured output
-    - Prevent task stuck, errors
+You start background tasks following this strict workflow:
+
+1. `pueue status` to check if daemon is started, start with `pueued -d`
+2. Create a group for current project using `pueue group add -p 4 [project-name]` if not exist yet
+3. Use `pueue add -g [project-name] -- "uv run python -u src/train.py"` to start task in background
+4. Start `pueue follow [task id]` in background; when task completes, you will receive notification from it
+5. Report task progress in percentage and ETA by checking `pueue log [task id]` periodically
 
 ---
 
@@ -175,8 +172,9 @@ pueue status --json | jq ".tasks.\"$id\".result"
 ## Key Pitfalls
 
 - Always use `--` before commands that have their own flags: `pueue add -- ls -al`
+- Always use `-g` with project name to avoid name pollution
 - Wrap shell pipelines in quotes: `pueue add 'cmd1 | cmd2'`
+- Python tasks MUST add the option `-u` or set environment `PYTHONUNBUFFERED=1` for real-time output (otherwise would appear stuck)
 - `--escape` disables shell syntax (no `&&`, pipes) — avoid for shell pipelines
 - Task IDs are integers; quote them in `jq` with `.tasks.\"$id\"`
 - `pueue clean` only removes finished tasks — running tasks are unaffected
-- Not using `-g` with project name falls back to the `default` group
