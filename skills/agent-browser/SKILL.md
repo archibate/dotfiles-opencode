@@ -1,12 +1,30 @@
 ---
 name: agent-browser
-description: Browser automation CLI for AI agents. Use when the user needs to interact with websites, including navigating pages, filling forms, clicking buttons, taking screenshots, extracting data, testing web apps, or automating any browser task. TRIGGER when user requests to "open a website", "fill out a form", "click a button", "take a screenshot", "scrape data from a page", "test this web app", "login to a site", "automate browser actions", or any task requiring programmatic web interaction.
+description: Browser automation CLI for AI agents. Use when needs to interact with websites, including navigating pages, filling forms, clicking buttons, taking screenshots, extracting data, testing web apps, or automating any browser task. TRIGGER when user requests to "open a website", "fill out a form", "click a button", "take a screenshot", "debug this in browser", "scrape data from a page", "test this web app", "login to a site", "frontend UI/UX aesthetics", "automate browser actions", or any task requiring programmatic web interaction.
 allowed-tools: Bash(npx agent-browser:*), Bash(agent-browser:*)
 ---
 
 # Browser Automation with agent-browser
 
 The CLI uses Chrome/Chromium via CDP directly. Install via `npm i -g agent-browser`, `brew install agent-browser`, or `cargo install agent-browser`. Run `agent-browser install` to download Chrome.
+
+## Triggers
+
+### When To Use
+
+- Programmatic web interaction
+- Self-review on frontend UI/UX aesthetics
+- Frontend E2E interactive test
+- Automated web page manipulation
+- No persistent cookies required
+- Content with no login banner or paywall
+
+### When NOT To Use
+
+- API alternatives available (e.g. GitHub CLI, Bilibili API, Gmail MCP)
+- Unit & intergration test that already runs programmatically
+- Shared cookies, login states with user global browser - prefer Chrome MCP or /chrome-cdp skill
+- Web scrape - Use jina.ai MCP or /scrapling skill for efficiency
 
 ## Core Workflow
 
