@@ -142,7 +142,7 @@
             }
         }
     },
-    "model": "zhipuai-coding-plan/glm-5",
+    "model": "zhipuai-coding-plan/glm-5.1",
     // "model": "deepseek/deepseek-reasoner",
     // "model": "openrouter-compatible/anthropic/claude-sonnet-4.6",
     "small_model": "zhipuai-coding-plan/glm-4.5-air",
@@ -167,7 +167,7 @@
             "headers": {
                 "Authorization": "Bearer {env:Z_AI_API_KEY}"
             },
-            "enabled": false,
+            "enabled": true,
         },
         "web-reader": {
             "type": "remote",
